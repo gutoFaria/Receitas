@@ -24,5 +24,10 @@ namespace backend.Services
 
             return receitas;
         }
+
+        public async Task<IEnumerable<Receita>> GetReceitas()
+        {
+            return await _context.Receitas.ToListAsync();
+        }
     }
 }
