@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/receita.dart';
-import 'package:dio/dio.dart';
 import 'package:frontend/screens/receita_detail.dart';
+
+import '../models/receita.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -13,30 +14,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Receita> listaReceita = List<Receita>.empty(growable: true);
-  @override
-  void initState() {
-    super.initState();
-    final dio = Dio();
-    const url = 'http://localhost:5098/getallreceitas';
-
-    // ignore: unused_element
-    Future<List<Receita>> fetchReceitas() async {
-      final res = await dio.get(url);
-      final list = res.data as List;
-
-      //List<Receita> listReceita = [];
-      for (var json in list) {
-        final receita = Receita.fromJson(json);
-        listaReceita.add(receita);
-      }
-
-      return listaReceita;
-    }
-  }
-
+  
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -46,22 +27,51 @@ class _HomePageState extends State<HomePage> {
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
-      body: ListView.builder(
-        itemCount: listaReceita.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context){
-                    return ReceitaDetail(receita: listaReceita[index]);
-                  }
-                )
-              );
-            },
-          );
-        }),
+      body: Center(
+        child: ListView.builder(
+          itemCount:Receita.receitas.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context){
+                      return ReceitaDetail(receita:Receita.receitas[index]);
+                    }
+                  )
+                );
+              },
+              child: receitaCard(Receita.receitas[index]),
+            );
+          }),
+      ),
+    );
+  }
+
+  Widget receitaCard(Receita receita){
+    return Card(
+      elevation: 2.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0)
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Image.network(receita.imageUrl),
+            const SizedBox(height: 14.0,),
+            Text(receita.titulo,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'Palatino',
+              color: Colors.white
+            ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
